@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class ObjCube : MonoBehaviour
 {
-    private void Update()
+  
+    private void FixedUpdate()
     {
         transform.Translate(Vector3.left * 5f * Time.deltaTime);
+
+        if (UIManager.instance.DeadChk())
+        {
+            ObjPool.ReturnCube(this);
+        }
     }
 
     private void OnTriggerEnter(Collider col)
@@ -15,5 +21,6 @@ public class ObjCube : MonoBehaviour
         {
             ObjPool.ReturnCube(this);
         }
+       
     }
 }

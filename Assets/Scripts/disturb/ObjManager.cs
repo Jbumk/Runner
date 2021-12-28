@@ -18,7 +18,7 @@ public class ObjManager : MonoBehaviour
 
     private static  ObjManager m_inst;
     private double CoolTime = 2.0;
-    private float Timer = 2;
+    private float Timer = 0;
 
     public GameObject Start;
 

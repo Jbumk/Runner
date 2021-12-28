@@ -7,18 +7,23 @@ public class Control : MonoBehaviour
     public GameObject Player;
     private Rigidbody rigid;
     private float Gravity=25f;
-    private float JumpPower = 4.5f;
+    private float JumpPower = 34f;
+    private MeshRenderer Rend;
 
     private Vector3 PlayerForward=new Vector3(0,90,0);
     private Vector3 PlayerVec;
     private Vector3 RayVec;
-    public static bool isDead = false;
+    private Vector3 OriginVec = new Vector3(-7, 2, 0);
     public GameObject Explosion;
+
+    private float ExploTimer = 0;
+    private double DuraExplo = 2.0;
 
 
     private void Start()
     {
         rigid = Player.GetComponent<Rigidbody>();
+        Rend = Player.GetComponent<MeshRenderer>();
     }
 
 
@@ -32,21 +37,35 @@ public class Control : MonoBehaviour
         PlayerVec.y = Player.transform.position.y;
         Player.transform.position = PlayerVec;
 
-        if (Input.GetMouseButton(0))
+
+        if (UIManager.instance.DeadChk())
         {
-            rigid.AddForce(Vector3.up * JumpPower);
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            Gravity *= -1;
-            JumpPower *= -1;
+            ExploTimer += Time.deltaTime;
+            if (ExploTimer >= DuraExplo)
+            {
+                Explosion.SetActive(false);
+                ExploTimer = 0;
+            }           
         }
           
+
     }
 
     private void FixedUpdate()
     {
-        
+        if (!UIManager.instance.DeadChk())
+        {
+            if (Input.GetMouseButton(0))
+            {
+                rigid.AddForce(Vector3.up * JumpPower);
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                Gravity *= -1;
+                JumpPower *= -1;
+            }
+        }
+
         rigid.AddForce(Vector3.down * Gravity);
       
     }
@@ -59,12 +78,22 @@ public class Control : MonoBehaviour
             RayVec = (col.transform.position - Player.transform.position).normalized;
             if(RayVec.y>-0.5 && RayVec.y < 0.5)
             {
-                isDead = true;                
-                Player.gameObject.SetActive(false);
+                UIManager.instance.Dead();
+                Rend.enabled = false;
                 Explosion.transform.position = Player.transform.position;
                 Explosion.gameObject.SetActive(true);
                 Debug.Log("사망 " + RayVec.y);                
             }
         }
+    }
+
+    public void Revive()
+    {
+        ExploTimer = 0;
+        Rend.enabled = true;
+        Explosion.gameObject.SetActive(false);
+        Player.transform.position = OriginVec;
+        UIManager.instance.Revive();
+
     }
 }
