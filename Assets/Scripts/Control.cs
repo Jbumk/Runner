@@ -53,45 +53,55 @@ public class Control : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!UIManager.instance.DeadChk())
+        if (UIManager.instance.StartChk())
         {
-            if (Input.GetMouseButton(0))
+            if (!UIManager.instance.DeadChk())
             {
-                rigid.AddForce(Vector3.up * JumpPower);
+                if (Input.GetMouseButton(0))
+                {
+                    rigid.AddForce(Vector3.up * JumpPower);
+                }
+              
             }
-            if (Input.GetMouseButtonDown(1))
-            {
-                Gravity *= -1;
-                JumpPower *= -1;
-            }
-        }
 
-        rigid.AddForce(Vector3.down * Gravity);
+            rigid.AddForce(Vector3.down * Gravity);
+        }
+        else
+        {
+            rigid.velocity = Vector3.zero;
+        }
       
     }
 
     private void OnCollisionEnter(Collision col)
     {
        
-        if (col.gameObject.CompareTag("Disturb"))
+        if (col.gameObject.CompareTag("Disturb")&&!UIManager.instance.DeadChk())
         {
             RayVec = (col.transform.position - Player.transform.position).normalized;
-            if(RayVec.y>-0.5 && RayVec.y < 0.5)
+            if (col.gameObject.name==("Cube(Clone)"))
             {
-                UIManager.instance.Dead();
-                Rend.enabled = false;
+                if (RayVec.y > -0.5 && RayVec.y < 0.5)
+                {
+                    UIManager.instance.Dead();                   
+                    Explosion.transform.position = Player.transform.position;
+                    Explosion.gameObject.SetActive(true);
+                    Debug.Log("사망 " + RayVec.y);
+                }
+            }
+            else
+            {
+                UIManager.instance.Dead();                
                 Explosion.transform.position = Player.transform.position;
                 Explosion.gameObject.SetActive(true);
-                Debug.Log("사망 " + RayVec.y);                
+                Debug.Log("사망 " + RayVec.y);
             }
         }
     }
 
     public void Revive()
     {
-        ExploTimer = 0;
-        Rend.enabled = true;
-        Explosion.gameObject.SetActive(false);
+        ExploTimer = 0;      
         Player.transform.position = OriginVec;
         UIManager.instance.Revive();
 

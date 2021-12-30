@@ -53,6 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
+    <Compile Include="Assets\Scripts\disturb\ObjCross.cs" />
     <Compile Include="Assets\Scripts\disturb\ObjPool.cs" />
     <Compile Include="Assets\Scripts\disturb\ObjManager.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />

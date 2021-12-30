@@ -9,6 +9,9 @@ public class ObjPool : MonoBehaviour
     public GameObject Pre_Cube;
     Queue<ObjCube> CubePool = new Queue<ObjCube>();
 
+    public GameObject Pre_Cross;
+    Queue<ObjCross> CrossPool = new Queue<ObjCross>();
+
     private void Awake()
     {
         instance = this;
@@ -19,16 +22,19 @@ public class ObjPool : MonoBehaviour
     {
         for(int i=0; i < count; i++)
         {
-            CubePool.Enqueue(CreateNewObj());
+            CubePool.Enqueue(CreateNewCube());
+            CrossPool.Enqueue(CreateNewCross());
         }
     }
-    
-    private ObjCube CreateNewObj()
+
+    //큐브 생성 구간ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    private ObjCube CreateNewCube()
     {
+
         var NewObj = Instantiate(Pre_Cube).GetComponent<ObjCube>();
         NewObj.transform.SetParent(transform);
         NewObj.gameObject.SetActive(false);
-
         return NewObj;
     }
 
@@ -43,7 +49,7 @@ public class ObjPool : MonoBehaviour
         }
         else
         {
-            var newObj = instance.CreateNewObj();
+            var newObj = instance.CreateNewCube();
             newObj.transform.SetParent(null);
             newObj.gameObject.SetActive(true);
             return newObj;
@@ -56,7 +62,47 @@ public class ObjPool : MonoBehaviour
         obj.gameObject.SetActive(false);
         instance.CubePool.Enqueue(obj);
     }
+
+    //큐브 생성 구간 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     
+
+    //Cross 생성 구간 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+    private ObjCross CreateNewCross()
+    {
+        var newObj = Instantiate(Pre_Cross).GetComponent<ObjCross>();
+        newObj.transform.SetParent(transform);
+        newObj.gameObject.SetActive(false);
+        return newObj;
+    }
+
+    public static ObjCross GetCross()
+    {
+        if (instance.CrossPool.Count > 0)
+        {
+            var Obj = instance.CrossPool.Dequeue();
+            Obj.transform.SetParent(null);
+            Obj.gameObject.SetActive(true);
+
+            return Obj;
+        }
+        else
+        {
+            var Obj = instance.CreateNewCross();
+            Obj.transform.SetParent(null);
+            Obj.gameObject.SetActive(true);
+
+            return Obj;
+        }
+    }
+
+    public static void ReturnCross(ObjCross obj)
+    {
+        obj.transform.SetParent(instance.transform);
+        obj.gameObject.SetActive(false);
+        instance.CrossPool.Enqueue(obj);
+    }
  
+    //Cross 생성 구간 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 }
