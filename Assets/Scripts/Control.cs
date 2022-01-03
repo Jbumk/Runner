@@ -19,6 +19,8 @@ public class Control : MonoBehaviour
     private float ExploTimer = 0;
     private double DuraExplo = 2.0;
 
+ 
+
 
     private void Start()
     {

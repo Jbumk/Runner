@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -43,6 +44,12 @@ public class UIManager : MonoBehaviour
     public TextMeshPro StartClock;
     private int MenuCode = 0;
 
+    [Header("Rank Menu")]
+    //랭킹메뉴 관련
+    public GameObject Menu_Rank;
+    public TextMeshPro[] Rank;
+    public TextMeshPro NowRank;
+
 
     //시작전 카운트
     private float StartTimer = 0; 
@@ -58,8 +65,10 @@ public class UIManager : MonoBehaviour
     public Slider Slider_Efect;
 
     private void Awake()
-    {
+    {       
         Rend = Player.GetComponent<Renderer>();
+        Slider_BGM.value =  RankManager.instance.rankData.Volum_BGM;
+        Slider_Efect.value =RankManager.instance.rankData.Volum_Effect ;
     }
 
 
@@ -88,7 +97,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    //메뉴 관련
+    //메뉴 관련ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     public void Quit()
     {
         Application.Quit();
@@ -120,9 +129,13 @@ public class UIManager : MonoBehaviour
         Clock.gameObject.SetActive(false);
         StartClock.gameObject.SetActive(false);
         Btn_Menu.SetActive(false);
+        Menu_Rank.SetActive(false);
         Menu_Set.SetActive(false);
         Menu.SetActive(false);
-        Menu_Main.SetActive(true);        
+        Menu_Main.SetActive(true);
+        RankManager.instance.rankData.Volum_BGM = Slider_BGM.value;
+        RankManager.instance.rankData.Volum_Effect = Slider_Efect.value;
+        RankManager.instance.SaveRankData();
     }
 
     public void Setting()
@@ -141,6 +154,7 @@ public class UIManager : MonoBehaviour
         Clock.gameObject.SetActive(false);
         Btn_Menu.SetActive(false);
         Menu_Set.SetActive(true);
+       
     }
     public void Back()
     {
@@ -157,8 +171,32 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
+        RankManager.instance.rankData.Volum_BGM = Slider_BGM.value;
+        RankManager.instance.rankData.Volum_Effect = Slider_Efect.value;
+        RankManager.instance.SaveRankData();
+
+
+    }
+
+    //메뉴창 눌렀을시 랭킹
+    public void Menu_RankOn()
+    {
+        Menu_Rank.SetActive(true);
+        Menu_Main.SetActive(false);
+        Array.Sort(RankManager.instance.rankData.Rank);
+        Array.Reverse(RankManager.instance.rankData.Rank);
+        for(int i=0; i < RankManager.instance.rankData.Rank.Length; i++)
+        {
+            Rank[i].text = string.Format("{0:N2}", RankManager.instance.rankData.Rank[i])  + " 초";
+        }
         
     }
+    
+
+    //메뉴관련 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    
+    //기능관련
 
     public void GameStart()
     {
@@ -182,7 +220,7 @@ public class UIManager : MonoBehaviour
 
     //죽음 관련
     public void Dead()
-    {
+    {        
         Rend.enabled = false;
         DeadSound.Play();
         BGM.Stop();
@@ -191,6 +229,8 @@ public class UIManager : MonoBehaviour
         Btn_Resume.SetActive(false);
         Menu.SetActive(true);        
         isDead = true;
+        Record();
+       
     }
     
     public void Revive()
@@ -210,10 +250,44 @@ public class UIManager : MonoBehaviour
         Menu.SetActive(false);       
         DeadScene.SetActive(false);
     }
+
+    //사망시 랭킹 기록
+    public void Record()
+    {
+        RankManager.instance.LoadRankData();     
+        Array.Sort(RankManager.instance.rankData.Rank);
+        Array.Reverse(RankManager.instance.rankData.Rank);
+        if (RankManager.instance.rankData.Rank[RankManager.instance.rankData.Rank.Length - 1] < Timer)
+        {
+            RankManager.instance.rankData.Rank[RankManager.instance.rankData.Rank.Length - 1] = Timer;
+            Array.Sort(RankManager.instance.rankData.Rank);
+            Array.Reverse(RankManager.instance.rankData.Rank);
+
+            for (int i = 0; i < RankManager.instance.rankData.Rank.Length; i++)
+            {
+                Rank[i].text = RankManager.instance.rankData.Rank[i] + " 초";
+                if (RankManager.instance.rankData.Rank[i] == Timer)
+                {                  
+                    NowRank.text = (i+1) + " 위";
+                }
+            }
+        }
+        else
+        {
+            NowRank.text = "Rank Out";
+        }
+
+        RankManager.instance.SaveRankData();
+    }
+
+
+
+
     public bool DeadChk()
     {
         return isDead;
     }
+
 
     //스타트 관련
     public bool StartChk()
