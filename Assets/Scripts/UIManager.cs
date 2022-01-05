@@ -56,6 +56,8 @@ public class UIManager : MonoBehaviour
     private bool isStart = false;
     private bool isDead = true;
     private float Timer = 0;
+    private bool doReset = false;
+
 
     [Header("Sounds")]
     //소리관련
@@ -63,6 +65,11 @@ public class UIManager : MonoBehaviour
     public AudioSource DeadSound;
     public Slider Slider_BGM;
     public Slider Slider_Efect;
+
+    [Header("Gravity")]
+    public GameObject GravityRev;
+    public GameObject GravityNormal;
+    private float RevTimer = 0;
 
     private void Awake()
     {       
@@ -81,6 +88,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            doReset = false;
             StartClock.gameObject.SetActive(false);
             isStart = true;
         }
@@ -91,7 +99,17 @@ public class UIManager : MonoBehaviour
             Clock.text = string.Format("{0:N2}", Timer) + " 초";
             //Clock.text = Mathf.Floor(Timer*100)*0.01f + " Sec";
         }
-        
+        if (RevTimer > 0)
+        {
+            RevTimer -= Time.deltaTime;
+            if (RevTimer <= 0)
+            {
+                
+                GravityNormal.SetActive(false);
+                GravityRev.SetActive(false);
+            }
+        }
+
         BGM.volume = Slider_BGM.value;
         DeadSound.volume = Slider_Efect.value;
 
@@ -194,8 +212,26 @@ public class UIManager : MonoBehaviour
     
 
     //메뉴관련 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
     
+    //중력전환관련 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+    public void Gravity_Rev()
+    {
+        RevTimer = 0.5f;        
+        GravityRev.SetActive(true);        
+    }
+
+    public void Gravity_normal()
+    {
+        RevTimer = 0.5f;       
+        GravityNormal.SetActive(true);        
+    }
+
+
+    //중력전환관련 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+       
+   
     //기능관련
 
     public void GameStart()
@@ -235,6 +271,7 @@ public class UIManager : MonoBehaviour
     
     public void Revive()
     {
+        doReset = true;
         Explo.SetActive(false);
         Rend.enabled = true;
         Player.transform.position = PlayerVec;
@@ -242,13 +279,13 @@ public class UIManager : MonoBehaviour
         StartClock.gameObject.SetActive(true);
         StartTimer = 3.0f;
         Clock.text = "";
-        isStart = false;
-        isDead = false;
+        isStart = false;        
         Time.timeScale = 1f;
         Timer = 0;
         Btn_Menu.SetActive(true);       
         Menu.SetActive(false);       
         DeadScene.SetActive(false);
+        isDead = false;
     }
 
     //사망시 랭킹 기록
@@ -293,5 +330,10 @@ public class UIManager : MonoBehaviour
     public bool StartChk()
     {
         return isStart;
+    }
+
+    public bool ResetChk()
+    {
+        return doReset;
     }
 }

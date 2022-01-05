@@ -32,7 +32,7 @@ public class ObjManager : MonoBehaviour
             Timer += Time.deltaTime;
             if (Timer >= CoolTime)
             {
-                ObjCode = Random.Range(0, 2);
+                ObjCode = Random.Range(0, 3);
                 RandomSize = Random.Range(0, 3);
                 Size.x = RandomSize;
                 Size.y = RandomSize;
@@ -47,10 +47,18 @@ public class ObjManager : MonoBehaviour
                         break;
                     case 1:
                         var NewCross = ObjPool.GetCross();
+                        NewCross.setSpin(Random.Range(0, 2));
                         NewCross.transform.position = Start.transform.position;
                         NewCross.transform.localScale += Size;
                         NewCross.transform.position += Vector3.up * Random.Range(2.5f + RandomSize, 6.3f - RandomSize);
                         break;
+                    case 2:
+                        var NewGravity = ObjPool.GetGravity();
+                        NewGravity.transform.position = Start.transform.position;
+                        NewGravity.transform.position += Vector3.up * 3.8f;
+                        break;
+
+
                 }
 
                 Timer = 0;

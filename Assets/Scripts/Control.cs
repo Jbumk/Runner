@@ -11,13 +11,16 @@ public class Control : MonoBehaviour
     private MeshRenderer Rend;
 
     private Vector3 PlayerForward=new Vector3(0,90,0);
-    private Vector3 PlayerVec;
+    private Vector3 PlayerVec;  
     private Vector3 RayVec;
     private Vector3 OriginVec = new Vector3(-7, 2, 0);
     public GameObject Explosion;
 
     private float ExploTimer = 0;
     private double DuraExplo = 2.0;
+    private bool isReverse = false;
+    
+
 
  
 
@@ -40,14 +43,17 @@ public class Control : MonoBehaviour
         Player.transform.position = PlayerVec;
 
 
-        if (UIManager.instance.DeadChk())
+        if (UIManager.instance.DeadChk() || UIManager.instance.ResetChk())
         {
             ExploTimer += Time.deltaTime;
             if (ExploTimer >= DuraExplo)
             {
                 Explosion.SetActive(false);
                 ExploTimer = 0;
-            }           
+            }
+            Gravity = 25f;
+            JumpPower = 34f;
+            isReverse = false;
         }
           
 
@@ -81,24 +87,51 @@ public class Control : MonoBehaviour
         if (col.gameObject.CompareTag("Disturb")&&!UIManager.instance.DeadChk())
         {
             RayVec = (col.transform.position - Player.transform.position).normalized;
-            if (col.gameObject.name==("Cube(Clone)"))
+            if (col.gameObject.name == ("Cube(Clone)"))
             {
                 if (RayVec.y > -0.5 && RayVec.y < 0.5)
                 {
-                    UIManager.instance.Dead();                   
+                    Gravity = 25f;
+                    JumpPower = 34f;
+                    isReverse = false;
+                    UIManager.instance.Dead();
                     Explosion.transform.position = Player.transform.position;
                     Explosion.gameObject.SetActive(true);
                     Debug.Log("사망 " + RayVec.y);
+                    
                 }
             }
             else
             {
-                UIManager.instance.Dead();                
+                Gravity = 25f;
+                JumpPower = 34f;
+                UIManager.instance.Dead();
+                isReverse = false;
                 Explosion.transform.position = Player.transform.position;
                 Explosion.gameObject.SetActive(true);
                 Debug.Log("사망 " + RayVec.y);
             }
         }
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.CompareTag("Gravity")){
+            if (isReverse)
+            {               
+                UIManager.instance.Gravity_normal();
+                isReverse = false;
+            }
+            else
+            {              
+                UIManager.instance.Gravity_Rev();
+                isReverse = true;
+            }
+            Gravity *= -1;
+            JumpPower *= -1;
+          
+        }
+        
     }
 
     public void Revive()
@@ -108,4 +141,5 @@ public class Control : MonoBehaviour
         UIManager.instance.Revive();
 
     }
+
 }

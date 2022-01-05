@@ -7,6 +7,9 @@ TagManager:
   - Ground
   - End
   - Disturb
+  - ElseObj
+  - Explosion
+  - Gravity
   layers:
   - Default
   - TransparentFX

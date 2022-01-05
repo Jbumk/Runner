@@ -10,7 +10,7 @@ public class ObjCube : MonoBehaviour
     {
         transform.Translate(Vector3.left * 5f * Time.deltaTime);
 
-        if (UIManager.instance.DeadChk())
+        if (UIManager.instance.DeadChk() || UIManager.instance.ResetChk())
         {
             transform.localScale = Origin;
             ObjPool.ReturnCube(this);

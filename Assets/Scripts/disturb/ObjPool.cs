@@ -12,6 +12,9 @@ public class ObjPool : MonoBehaviour
     public GameObject Pre_Cross;
     Queue<ObjCross> CrossPool = new Queue<ObjCross>();
 
+    public GameObject Pre_Gravity;
+    Queue<ObjGravity> GravityPool = new Queue<ObjGravity>();
+
     private void Awake()
     {
         instance = this;
@@ -24,6 +27,7 @@ public class ObjPool : MonoBehaviour
         {
             CubePool.Enqueue(CreateNewCube());
             CrossPool.Enqueue(CreateNewCross());
+            GravityPool.Enqueue(CreateNewGravity());
         }
     }
 
@@ -104,5 +108,43 @@ public class ObjPool : MonoBehaviour
     }
  
     //Cross 생성 구간 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    //GraviryGate 생성 구간 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+    private ObjGravity CreateNewGravity()
+    {
+        var newObj = Instantiate(Pre_Gravity).GetComponent<ObjGravity>();
+        newObj.transform.SetParent(transform);
+        newObj.gameObject.SetActive(false);
+
+        return newObj;
+    }
+
+    public static ObjGravity GetGravity()
+    {
+        if (instance.GravityPool.Count > 0)
+        {
+            var obj = instance.GravityPool.Dequeue();
+            obj.transform.SetParent(null);
+            obj.gameObject.SetActive(true);
+
+            return obj;
+        }
+        else
+        {
+            var newObj = instance.CreateNewGravity();
+            newObj.transform.SetParent(null);
+            newObj.gameObject.SetActive(true);
+
+            return newObj;
+        }
+    }
+
+    public static void ReturnGravity(ObjGravity obj)
+    {
+        obj.transform.SetParent(instance.transform);
+        obj.gameObject.SetActive(false);
+        instance.GravityPool.Enqueue(obj);
+    }
 
 }
